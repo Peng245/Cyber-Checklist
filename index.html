@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cybersecurity Self-Assessment | IIA Topical Requirement</title>
+<style>
+  :root {
+    --green: #7ac143;
+    --dark-green: #5a9e2f;
+    --blue: #1e3a5f;
+    --light-blue: #2d6a9f;
+    --gray-bg: #f4f6f9;
+    --white: #ffffff;
+    --border: #dde3ec;
+    --text: #2c3e50;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--gray-bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--light-blue) 100%);
+    color: white;
+    padding: 40px 20px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; top: -50%; left: -20%;
+    width: 60%; height: 200%;
+    background: rgba(255,255,255,0.04);
+    transform: rotate(15deg);
+    pointer-events: none;
+  }
+  header .badge {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+  header p { font-size: 1rem; opacity: 0.85; max-width: 600px; margin: 0 auto; }
+  /* Progress bar */
+  .progress-bar-wrap {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    position: sticky; top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .progress-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--blue); }
+  .progress-bar {
+    height: 10px; background: #e0e7f0; border-radius: 10px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, var(--green), var(--dark-green));
+    border-radius: 10px; transition: width 0.4s ease;
+  }
+  /* Main */
+  main { max-width: 900px; margin: 0 auto; padding: 30px 16px 60px; }
+  /* Intro card */
+  .intro-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--green);
+  }
+  .intro-card h2 { color: var(--blue); font-size: 1.1rem; margin-bottom: 10px; }
+  .intro-card p { font-size: 0.95rem; color: #555; }
+  .scale-guide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .scale-item {
+    background: var(--gray-bg);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+  }
+  .scale-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px; color: white; flex-shrink: 0;
+  }
+  /* Domain section */
+  .domain-section { margin-bottom: 36px; }
+  .domain-header {
+    border-radius: 14px 14px 0 0;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: white;
+  }
+  .domain-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .domain-title { font-size: 1.15rem; font-weight: 700; }
+  .domain-subtitle { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+  .domain-score-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    padding: 6px 14px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .domain-score-badge .score-val { font-size: 1.4rem; font-weight: 800; display: block; }
+  .domain-gv .domain-header { background: linear-gradient(135deg, #1e3a5f, #2d6a9f); }
+  .domain-rm .domain-header { background: linear-gradient(135deg, #7a3f00, #c0622a); }
+  .domain-cp .domain-header { background: linear-gradient(135deg, #1a5c3a, #2d9b5a); }
+  .domain-body {
+    background: white;
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  /* Requirement card */
+  .req-card {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .req-card:last-child { border-bottom: none; }
+  .req-card:hover { background: #f8faff; }
+  .req-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .req-id {
+    background: var(--gray-bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--blue);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .req-text { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+  .req-desc { font-size: 0.85rem; color: #666; margin-top: 4px; font-weight: 400; }
+  /* Rating buttons */
+  .rating-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .rating-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 9px 6px;
+    border: 2px solid var(--border);
+    background: var(--gray-bg);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #777;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .rating-btn .r-num {
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+  .rating-btn:hover { transform: translateY(-2px); border-color: #aab; }
+  .rating-btn.selected-1 { background: #fde8e8; border-color: #e05555; color: #c0392b; }
+  .rating-btn.selected-2 { background: #fff0e0; border-color: #e08030; color: #c0622a; }
+  .rating-btn.selected-3 { background: #fffbe0; border-color: #d4b000; color: #9a7d00; }
+  .rating-btn.selected-4 { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; }
+  .rating-btn.selected-5 { background: #e3f2fd; border-color: #1976d2; color: #0d47a1; }
+  /* Results */
+  #results-section {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: var(--shadow);
+    margin-top: 32px;
+  }
+  #results-section h2 { color: var(--blue); font-size: 1.4rem; margin-bottom: 6px; }
+  #results-section .sub { color: #888; font-size: 0.9rem; margin-bottom: 28px; }
+  .overall-score-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    font-weight: 800;
+    color: white;
+    font-size: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .overall-score-circle .label { font-size: 0.8rem; font-weight: 600; opacity: 0.9; }
+  .domain-result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .domain-result-card {
+    border-radius: 12px;
+    padding: 18px 20px;
+    color: white;
+  }
+  .domain-result-card .d-name { font-size: 0.85rem; opacity: 0.85; margin-bottom: 6px; }
+  .domain-result-card .d-score { font-size: 2rem; font-weight: 800; }
+  .domain-result-card .d-max { font-size: 0.8rem; opacity: 0.75; }
+  .domain-result-card .d-bar { height: 6px; background: rgba(255,255,255,0.3); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+  .domain-result-card .d-bar-fill { height: 100%; background: white; border-radius: 4px; }
+  /* Gap analysis table */
+  .gap-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 16px; }
+  .gap-table th { background: var(--blue); color: white; padding: 10px 14px; text-align: left; }
+  .gap-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .gap-table tr:hover td { background: #f0f4ff; }
+  .level-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .level-1 { background: #fde8e8; color: #c0392b; }
+  .level-2 { background: #fff0e0; color: #c0622a; }
+  .level-3 { background: #fffbe0; color: #9a7d00; }
+  .level-4 { background: #e8f5e9; color: #2e7d32; }
+  .level-5 { background: #e3f2fd; color: #0d47a1; }
+  .priority-high { color: #e05555; font-weight: 700; }
+  .priority-med { color: #e08030; font-weight: 700; }
+  .priority-low { color: #4caf50; font-weight: 700; }
+  /* Recommendation section */
+  .rec-section { margin-top: 24px; }
+  .rec-section h3 { color: var(--blue); font-size: 1.05rem; margin-bottom: 14px; }
+  .rec-item {
+    display: flex; gap: 12px;
+    background: var(--gray-bg);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--green);
+  }
+  .rec-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--green); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px; flex-shrink: 0;
+  }
+  .rec-text { font-size: 0.88rem; color: #444; }
+  /* Buttons */
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 32px; }
+  .btn {
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: #162d4a; transform: translateY(-2px); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: var(--dark-green); transform: translateY(-2px); }
+  .btn-outline { background: white; color: var(--blue); border: 2px solid var(--blue); }
+  .btn-outline:hover { background: #f0f4ff; }
+  /* Print */
+  @media print {
+    .progress-bar-wrap, .btn-row { display: none; }
+    body { background: white; }
+    main { padding: 0; max-width: 100%; }
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.4rem; }
+    .req-card { padding: 16px; }
+    .rating-btn { min-width: 60px; font-size: 0.75rem; }
+    .domain-header { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">IIA — Cybersecurity Topical Requirement 2025</div>
+  <h1>🔐 แบบประเมินความพร้อม Cybersecurity</h1>
+  <p>ประเมินองค์กรของคุณใน 17 Requirement ครอบคลุม 3 Domain หลัก ตามมาตรฐาน IIA</p>
+</header>
+
+<div class="progress-bar-wrap">
+  <div class="progress-info">
+    <span>ความคืบหน้าการประเมิน</span>
+    <span id="progress-text">0 / 17 ข้อ</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<main>
+  <!-- Intro -->
+  <div class="intro-card">
+    <h2>📋 วิธีการประเมิน</h2>
+    <p>เลือกระดับที่ตรงกับสถานะขององค์กรคุณมากที่สุดสำหรับแต่ละ Requirement ทั้ง 17 ข้อ จากนั้นกด "ดูผลการประเมิน" เพื่อทราบระดับความพร้อมและข้อแนะนำในการพัฒนา</p>
+    <div class="scale-guide">
+      <div class="scale-item"><div class="scale-dot" style="background:#e05555">1</div><div><strong>ไม่มี/ไม่รู้</strong><br><span style="color:#999">ยังไม่ได้เริ่ม</span></div></div>
+      <div class="scale-item"><div class="scale-dot" style="background:#e08030">2</div><div><strong>เริ่มต้น</strong><br><span style="color:#999">วางแผนแล้ว</span></div></div>
+      <div class="scale-item"><div class="scale-dot" style="background:#d4b000">3</div><div><strong>กำลังพัฒนา</strong><br><span style="color:#999">ทำบางส่วน</span></div></div>
+      <div class="scale-item"><div class="scale-dot" style="background:#4caf50">4</div><div><strong>ดำเนินการแล้ว</strong><br><span style="color:#999">ครบถ้วน</span></div></div>
+      <div class="scale-item"><div class="scale-dot" style="background:#1976d2">5</div><div><strong>เป็นเลิศ</strong><br><span style="color:#999">ปรับปรุงต่อเนื่อง</span></div></div>
+    </div>
+  </div>
+
+  <form id="assessment-form">
+
+    <!-- DOMAIN 1: GOVERNANCE -->
+    <div class="domain-section domain-gv">
+      <div class="domain-header">
+        <div class="domain-icon">🏛️</div>
+        <div>
+          <div class="domain-title">Domain 1: Governance</div>
+          <div class="domain-subtitle">การกำกับดูแล Cybersecurity ขององค์กร — 4 Requirements</div>
+        </div>
+        <div class="domain-score-badge">
+          <span class="score-val" id="gv-score">—</span>
+          คะแนน GV
+        </div>
+      </div>
+      <div class="domain-body">
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">GV-A</span>
+            <div>
+              <div class="req-text">Cybersecurity Strategy & Objectives</div>
+              <div class="req-desc">มีแผนกลยุทธ์ Cybersecurity ที่เป็นทางการ อัปเดตสม่ำเสมอ รายงานต่อคณะกรรมการพร้อมงบประมาณ</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="GV-A" data-domain="gv">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">GV-B</span>
+            <div>
+              <div class="req-text">Policies & Procedures</div>
+              <div class="req-desc">มีนโยบายและขั้นตอนปฏิบัติ Cybersecurity ที่ชัดเจน ทบทวนอย่างน้อยปีละครั้ง อิงตาม Framework สากล</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="GV-B" data-domain="gv">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">GV-C</span>
+            <div>
+              <div class="req-text">Roles & Responsibilities</div>
+              <div class="req-desc">กำหนดบทบาทและความรับผิดชอบ Cybersecurity อย่างชัดเจน มีการประเมินทักษะของบุคลากรสม่ำเสมอ</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="GV-C" data-domain="gv">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">GV-D</span>
+            <div>
+              <div class="req-text">Stakeholder Engagement</div>
+              <div class="req-desc">ผู้มีส่วนได้ส่วนเสียทุกกลุ่ม (ผู้บริหาร, HR, Legal, Vendor) มีส่วนร่วมรับมือภัยคุกคามไซเบอร์</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="GV-D" data-domain="gv">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DOMAIN 2: RISK MANAGEMENT -->
+    <div class="domain-section domain-rm">
+      <div class="domain-header">
+        <div class="domain-icon">⚠️</div>
+        <div>
+          <div class="domain-title">Domain 2: Risk Management</div>
+          <div class="domain-subtitle">การบริหารความเสี่ยง Cybersecurity — 6 Requirements</div>
+        </div>
+        <div class="domain-score-badge">
+          <span class="score-val" id="rm-score">—</span>
+          คะแนน RM
+        </div>
+      </div>
+      <div class="domain-body">
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">RM-A</span>
+            <div>
+              <div class="req-text">Risk Assessment Process</div>
+              <div class="req-desc">กระบวนการประเมินความเสี่ยงครอบคลุมการระบุ วิเคราะห์ ลดความเสี่ยง และติดตาม Cyber Threats</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="RM-A" data-domain="rm">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">RM-B</span>
+            <div>
+              <div class="req-text">Organization-wide Risk Management</div>
+              <div class="req-desc">บริหารความเสี่ยงทั่วทั้งองค์กร ครอบคลุม IT, HR, Legal, Finance, Supply Chain ไม่ใช่แค่ฝ่าย IT</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="RM-B" data-domain="rm">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">RM-C</span>
+            <div>
+              <div class="req-text">Accountability & Ownership</div>
+              <div class="req-desc">มีบุคคลหรือทีมรับผิดชอบติดตามและรายงานสถานะความเสี่ยงไซเบอร์ รวมถึงทรัพยากรที่ต้องการ</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="RM-C" data-domain="rm">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">RM-D</span>
+            <div>
+              <div class="req-text">Risk Escalation Process</div>
+              <div class="req-desc">มีกระบวนการ Escalate ความเสี่ยงที่เกินระดับที่ยอมรับได้อย่างรวดเร็ว คำนึงถึงผลกระทบทางการเงินและชื่อเสียง</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="RM-D" data-domain="rm">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">RM-E</span>
+            <div>
+              <div class="req-text">Risk Communication & Awareness</div>
+              <div class="req-desc">มีกระบวนการสื่อสารความตระหนักไซเบอร์ให้พนักงาน รวมถึงรายงานช่องว่างและการแก้ไขอย่างทันเวลา</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="RM-E" data-domain="rm">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">RM-F</span>
+            <div>
+              <div class="req-text">Incident Response & Recovery</div>
+              <div class="req-desc">มีแผน Incident Response ครอบคลุมการตรวจจับ ควบคุม ฟื้นฟู และวิเคราะห์หลังเหตุการณ์ ทดสอบสม่ำเสมอ</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="RM-F" data-domain="rm">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DOMAIN 3: CONTROL PROCESSES -->
+    <div class="domain-section domain-cp">
+      <div class="domain-header">
+        <div class="domain-icon">🛡️</div>
+        <div>
+          <div class="domain-title">Domain 3: Control Processes</div>
+          <div class="domain-subtitle">มาตรการควบคุม Cybersecurity เชิงปฏิบัติ — 7 Requirements</div>
+        </div>
+        <div class="domain-score-badge">
+          <span class="score-val" id="cp-score">—</span>
+          คะแนน CP
+        </div>
+      </div>
+      <div class="domain-body">
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-A</span>
+            <div>
+              <div class="req-text">Internal & Vendor Controls</div>
+              <div class="req-desc">มีการควบคุมทั้งภายในและจาก Vendor (SOC Reports) เพื่อปกป้อง CIA ของข้อมูลและระบบ ประเมินประสิทธิผลสม่ำเสมอ</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-A" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-B</span>
+            <div>
+              <div class="req-text">Talent Management</div>
+              <div class="req-desc">มีกระบวนการพัฒนาบุคลากร Cybersecurity อย่างต่อเนื่อง รวมถึงการฝึกอบรมและรับรองวิชาชีพ</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-B" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-C</span>
+            <div>
+              <div class="req-text">Continuous Threat Monitoring</div>
+              <div class="req-desc">ติดตามและรายงานภัยคุกคามและช่องโหว่ใหม่ๆ อย่างต่อเนื่อง รวมถึงภัยจากเทคโนโลยีใหม่ เช่น AI</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-C" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-D</span>
+            <div>
+              <div class="req-text">IT Asset Lifecycle Management</div>
+              <div class="req-desc">บริหารสินทรัพย์ IT ตลอดวงจรชีวิต ตั้งแต่เลือกซื้อ ใช้งาน บำรุงรักษา จนถึงปลดระวาง ทั้ง HW/SW/Vendor</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-D" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-E</span>
+            <div>
+              <div class="req-text">Security Configuration & DevSecOps</div>
+              <div class="req-desc">บังคับใช้ Configuration Security, Encryption, Patch Management, MFA, User Access Management และ DevSecOps</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-E" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-F</span>
+            <div>
+              <div class="req-text">Network Security Controls</div>
+              <div class="req-desc">มีมาตรการ Network Security: Segmentation, Firewall, VPN/Zero Trust, IoT Controls, IDS/IPS</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-F" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+        <div class="req-card">
+          <div class="req-top">
+            <span class="req-id">CP-G</span>
+            <div>
+              <div class="req-text">Endpoint Communication Security</div>
+              <div class="req-desc">ควบคุมความปลอดภัยในการสื่อสาร: Email, Web Browser, Video Conferencing, Social Media, Cloud, File Sharing</div>
+            </div>
+          </div>
+          <div class="rating-group" data-id="CP-G" data-domain="cp">
+            <button type="button" class="rating-btn" data-val="1"><span class="r-num">1</span>ไม่มี</button>
+            <button type="button" class="rating-btn" data-val="2"><span class="r-num">2</span>เริ่มต้น</button>
+            <button type="button" class="rating-btn" data-val="3"><span class="r-num">3</span>กำลังพัฒนา</button>
+            <button type="button" class="rating-btn" data-val="4"><span class="r-num">4</span>ดำเนินการแล้ว</button>
+            <button type="button" class="rating-btn" data-val="5"><span class="r-num">5</span>เป็นเลิศ</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" onclick="calculateResults()">📊 ดูผลการประเมิน</button>
+      <button type="button" class="btn btn-outline" onclick="resetForm()">🔄 เริ่มใหม่</button>
+    </div>
+
+  </form>
+
+  <!-- RESULTS SECTION -->
+  <div id="results-section">
+    <h2>📊 ผลการประเมินความพร้อม Cybersecurity</h2>
+    <p class="sub">ผลลัพธ์นี้เป็นเพียงการประเมินเบื้องต้น เพื่อระบุช่องว่างและวางแผนพัฒนาต่อไป</p>
+
+    <div class="overall-score-circle" id="overall-circle">
+      <span id="overall-pct">—</span>
+      <span class="label">คะแนนรวม</span>
+    </div>
+
+    <div id="maturity-label" style="text-align:center; font-size:1.2rem; font-weight:700; margin-bottom:24px;"></div>
+
+    <div class="domain-result-grid">
+      <div class="domain-result-card" style="background: linear-gradient(135deg,#1e3a5f,#2d6a9f)">
+        <div class="d-name">Domain 1: Governance</div>
+        <div><span class="d-score" id="res-gv-score">—</span> <span class="d-max">/ 20</span></div>
+        <div class="d-bar"><div class="d-bar-fill" id="res-gv-bar" style="width:0%"></div></div>
+      </div>
+      <div class="domain-result-card" style="background: linear-gradient(135deg,#7a3f00,#c0622a)">
+        <div class="d-name">Domain 2: Risk Management</div>
+        <div><span class="d-score" id="res-rm-score">—</span> <span class="d-max">/ 30</span></div>
+        <div class="d-bar"><div class="d-bar-fill" id="res-rm-bar" style="width:0%"></div></div>
+      </div>
+      <div class="domain-result-card" style="background: linear-gradient(135deg,#1a5c3a,#2d9b5a)">
+        <div class="d-name">Domain 3: Control Processes</div>
+        <div><span class="d-score" id="res-cp-score">—</span> <span class="d-max">/ 35</span></div>
+        <div class="d-bar"><div class="d-bar-fill" id="res-cp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--blue);margin-bottom:14px;">📋 รายละเอียดผลการประเมินแต่ละ Requirement</h3>
+    <table class="gap-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Requirement</th>
+          <th>ระดับ</th>
+          <th>สถานะ</th>
+          <th>ลำดับความสำคัญ</th>
+        </tr>
+      </thead>
+      <tbody id="gap-tbody"></tbody>
+    </table>
+
+    <div class="rec-section">
+      <h3>💡 ข้อแนะนำในการพัฒนา</h3>
+      <div id="recommendations"></div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-green" onclick="window.print()">🖨️ พิมพ์ผลการประเมิน</button>
+      <button type="button" class="btn btn-outline" onclick="resetForm()">🔄 ประเมินใหม่</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const requirements = {
+  'GV-A': { name: 'Cybersecurity Strategy & Objectives', domain: 'gv' },
+  'GV-B': { name: 'Policies & Procedures', domain: 'gv' },
+  'GV-C': { name: 'Roles & Responsibilities', domain: 'gv' },
+  'GV-D': { name: 'Stakeholder Engagement', domain: 'gv' },
+  'RM-A': { name: 'Risk Assessment Process', domain: 'rm' },
+  'RM-B': { name: 'Organization-wide Risk Management', domain: 'rm' },
+  'RM-C': { name: 'Accountability & Ownership', domain: 'rm' },
+  'RM-D': { name: 'Risk Escalation Process', domain: 'rm' },
+  'RM-E': { name: 'Risk Communication & Awareness', domain: 'rm' },
+  'RM-F': { name: 'Incident Response & Recovery', domain: 'rm' },
+  'CP-A': { name: 'Internal & Vendor Controls', domain: 'cp' },
+  'CP-B': { name: 'Talent Management', domain: 'cp' },
+  'CP-C': { name: 'Continuous Threat Monitoring', domain: 'cp' },
+  'CP-D': { name: 'IT Asset Lifecycle Management', domain: 'cp' },
+  'CP-E': { name: 'Security Configuration & DevSecOps', domain: 'cp' },
+  'CP-F': { name: 'Network Security Controls', domain: 'cp' },
+  'CP-G': { name: 'Endpoint Communication Security', domain: 'cp' },
+};
+const scores = {};
+let answered = 0;
+
+// Rating buttons logic
+document.querySelectorAll('.rating-group').forEach(group => {
+  group.querySelectorAll('.rating-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = group.dataset.id;
+      const val = parseInt(btn.dataset.val);
+      const domain = group.dataset.domain;
+      const wasAnswered = scores[id] !== undefined;
+      // Clear selection
+      group.querySelectorAll('.rating-btn').forEach(b => b.className = 'rating-btn');
+      btn.classList.add('selected-' + val);
+      scores[id] = val;
+      if (!wasAnswered) answered++;
+      updateProgress();
+      updateDomainScore(domain);
+    });
+  });
+});
+
+function updateProgress() {
+  const pct = Math.round(answered / 17 * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = answered + ' / 17 ข้อ';
+}
+
+function updateDomainScore(domain) {
+  const ids = Object.keys(requirements).filter(k => requirements[k].domain === domain);
+  const answered_d = ids.filter(k => scores[k] !== undefined);
+  if (answered_d.length === 0) return;
+  const sum = answered_d.reduce((a, k) => a + scores[k], 0);
+  const max = ids.length * 5;
+  const pct = Math.round(sum / max * 100);
+  document.getElementById(domain + '-score').textContent = pct + '%';
+}
+
+function calculateResults() {
+  if (answered < 17) {
+    alert('กรุณาตอบให้ครบทุก ' + (17 - answered) + ' ข้อที่เหลือก่อนดูผล');
+    return;
+  }
+  // Calc domain scores
+  const gvIds = ['GV-A','GV-B','GV-C','GV-D'];
+  const rmIds = ['RM-A','RM-B','RM-C','RM-D','RM-E','RM-F'];
+  const cpIds = ['CP-A','CP-B','CP-C','CP-D','CP-E','CP-F','CP-G'];
+  const gvSum = gvIds.reduce((a,k)=>a+scores[k],0);
+  const rmSum = rmIds.reduce((a,k)=>a+scores[k],0);
+  const cpSum = cpIds.reduce((a,k)=>a+scores[k],0);
+  const total = gvSum + rmSum + cpSum;
+  const maxTotal = 17 * 5;
+  const pct = Math.round(total / maxTotal * 100);
+
+  // Overall circle color
+  let circleColor, maturityText, maturityColor;
+  if (pct >= 80) {
+    circleColor = '#1976d2'; maturityText = '🏆 ระดับ Optimized — ดีเยี่ยม!'; maturityColor = '#1976d2';
+  } else if (pct >= 60) {
+    circleColor = '#4caf50'; maturityText = '✅ ระดับ Managed — ดี มีระบบ'; maturityColor = '#2e7d32';
+  } else if (pct >= 40) {
+    circleColor = '#d4b000'; maturityText = '⚠️ ระดับ Developing — กำลังพัฒนา'; maturityColor = '#9a7d00';
+  } else if (pct >= 20) {
+    circleColor = '#e08030'; maturityText = '🔶 ระดับ Initial — เริ่มต้น ต้องพัฒนา'; maturityColor = '#c0622a';
+  } else {
+    circleColor = '#e05555'; maturityText = '🚨 ระดับ Ad-hoc — ต้องปรับปรุงเร่งด่วน'; maturityColor = '#c0392b';
+  }
+
+  document.getElementById('overall-circle').style.background = `linear-gradient(135deg, ${circleColor}, ${circleColor}cc)`;
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('maturity-label').style.color = maturityColor;
+  document.getElementById('maturity-label').textContent = maturityText;
+
+  // Domain scores
+  document.getElementById('res-gv-score').textContent = gvSum;
+  document.getElementById('res-rm-score').textContent = rmSum;
+  document.getElementById('res-cp-score').textContent = cpSum;
+  document.getElementById('res-gv-bar').style.width = (gvSum/20*100) + '%';
+  document.getElementById('res-rm-bar').style.width = (rmSum/30*100) + '%';
+  document.getElementById('res-cp-bar').style.width = (cpSum/35*100) + '%';
+
+  // Gap table
+  const tbody = document.getElementById('gap-tbody');
+  tbody.innerHTML = '';
+  const levelNames = ['','ไม่มี','เริ่มต้น','กำลังพัฒนา','ดำเนินการแล้ว','เป็นเลิศ'];
+  const sortedIds = Object.keys(scores).sort((a,b) => scores[a]-scores[b]);
+  sortedIds.forEach(id => {
+    const v = scores[id];
+    let priority, priorityClass;
+    if (v <= 2) { priority = '🔴 เร่งด่วน'; priorityClass = 'priority-high'; }
+    else if (v === 3) { priority = '🟡 ควรปรับปรุง'; priorityClass = 'priority-med'; }
+    else { priority = '🟢 ดีแล้ว'; priorityClass = 'priority-low'; }
+    const row = `<tr>
+      <td><strong>${id}</strong></td>
+      <td>${requirements[id].name}</td>
+      <td><span class="level-badge level-${v}">${v} — ${levelNames[v]}</span></td>
+      <td>${'★'.repeat(v)}${'☆'.repeat(5-v)}</td>
+      <td class="${priorityClass}">${priority}</td>
+    </tr>`;
+    tbody.innerHTML += row;
+  });
+
+  // Recommendations
+  const lowItems = sortedIds.filter(id => scores[id] <= 2);
+  const midItems = sortedIds.filter(id => scores[id] === 3);
+  let recs = '';
+  if (lowItems.length > 0) {
+    recs += `<div class="rec-item"><div class="rec-num">!</div><div class="rec-text"><strong>ปรับปรุงเร่งด่วน:</strong> ${lowItems.join(', ')} — ควรกำหนดแผนดำเนินการทันที เนื่องจากยังขาดการควบคุมที่จำเป็น</div></div>`;
+  }
+  if (midItems.length > 0) {
+    recs += `<div class="rec-item"><div class="rec-num">2</div><div class="rec-text"><strong>พัฒนาต่อเนื่อง:</strong> ${midItems.join(', ')} — มีพื้นฐานที่ดี ควรกำหนด Timeline เพื่อยกระดับให้ครบถ้วน</div></div>`;
+  }
+  if (pct >= 60) {
+    recs += `<div class="rec-item"><div class="rec-num">3</div><div class="rec-text"><strong>รักษาระดับ:</strong> องค์กรมีระดับ Cybersecurity ที่ดี ควรทบทวนและปรับปรุงอย่างต่อเนื่องตามภัยคุกคามใหม่ๆ และผ่าน Internal Audit ตามมาตรฐาน IIA</div></div>`;
+  }
+  recs += `<div class="rec-item"><div class="rec-num">4</div><div class="rec-text"><strong>ขั้นตอนถัดไป:</strong> ใช้ผลการประเมินนี้เป็นจุดเริ่มต้นในการทำ Full Cybersecurity Audit ตาม IIA Topical Requirement เพื่อยืนยันสถานะและพัฒนา Roadmap ของงาน Internal Audit</div></div>`;
+  document.getElementById('recommendations').innerHTML = recs;
+
+  document.getElementById('results-section').style.display = 'block';
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  Object.keys(scores).forEach(k => delete scores[k]);
+  answered = 0;
+  document.querySelectorAll('.rating-btn').forEach(b => b.className = 'rating-btn');
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('progress-text').textContent = '0 / 17 ข้อ';
+  ['gv','rm','cp'].forEach(d => document.getElementById(d+'-score').textContent = '—');
+  document.getElementById('results-section').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
